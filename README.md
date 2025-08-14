@@ -218,7 +218,8 @@ helm cm-push postgresql local-chartmuseum
 helm install postgresql -n krateo-system ./manifests/krateo/template-chart/chart
 ```
 
-<video src="assets/krateo1.webm" width="320" height="240" controls></video>
+[krateo1.webm](https://github.com/user-attachments/assets/3fcf5fd7-30b8-42e7-8083-53e1601ec97a)
+
 
 ## Pipeline Tools Setup
 
@@ -352,7 +353,8 @@ helm upgrade --install jenkins --values ./manifests/jenkins/values.yaml --namesp
 
 this takes care of installing `jenkins`, setup the jobs, and install some plugins like the `kubernetes-credentials-provider` plugin required to read kubernetes secrets
 
-<video src="assets/jenkins.webm" width="320" height="240" controls></video>
+
+[jenkins.webm](https://github.com/user-attachments/assets/3b0cee8b-2502-49c5-94cb-ef32f3e8cc22)
 
 
 1. create github webhook to trigger `jenkins`
@@ -405,7 +407,7 @@ kubectl apply -f manifests/istio/telemetry.yaml
 ![alt text](assets/grafana-dashboard-5.jpg)
 > follow the steps to add `grafana-petclinic-dashboard.json` dashboard to `grafana`
 
-<video src="assets/petclinic.webm" width="320" height="240" controls></video>
+[petclinic.webm](https://github.com/user-attachments/assets/e52b4b46-d981-42c1-90e9-6d653f6b1458)
 
 
 ### Install Petclinic App
@@ -941,13 +943,13 @@ hal config canary aws edit --s3-enabled true
 
 Imagine a scenario where you are a company that provides petclinic management system as a `SAAS` product, Your project was based on spring cloud but recently migrated to `Istio`, You got a call from one of your petclinic clients complaining that they cannot view customers details from the dashboard, you tried to replicate the behavior on your management (prod-like) cluster to see if you have the same error.
 
-
-<video src="assets/error.webm" width="320" height="240" controls></video>
+[error.webm](https://github.com/user-attachments/assets/545cef52-a5d0-4829-a891-16eeb82a0635)
 
 
 After checking it appears that our application actually has a bug in it and cannot view customer details and not just a lag.
 
-<video src="assets/efk.webm" width="320" height="240" controls></video>
+[efk.webm](https://github.com/user-attachments/assets/7205335d-c76d-426e-a5f0-ae25d4dace16)
+
 
 As we have already set robust logging in our project we are able to  quickly identify which service caused the error, without the logging stack you would have spend alot of time trying to figure out which part of our app (frontend, vets, visits, customers) caused the error. As you can see it appears that the error is from the `frontend` service there is an error as it's trying to access `petclinic-customers-service.default.svc.cluster.local` and it's complaining about that the host is unreachable.
 
@@ -955,18 +957,21 @@ It appears that our developer hardcoded the customer service FQDN in the `fronte
 
 Now that we have identified the error source we need to fix it, as you can see our app consists of four microservices, three DBs and `istio` for managing routes. This feature cannot be tested alone we need to run at least the `frontend`, `customers`, `customers db`and `istio` to test it. As you can imagine this requires alot of resources and setup and even may not be possible. but luckily for us the DevOps Team has already setup a prod-like cluster that we can test on, also we have a cloud development environment setup so we can start development with a click of a button and a wrapper around `signadot` so we can create sandboxes and test our bug fixes or new features easily
 
-<video src="assets/devcontainer.webm" width="320" height="240" controls></video>
+[devcontainer.webm](https://github.com/user-attachments/assets/f129144c-1169-4896-a418-dab544126b50)
 
 After fixing the error in the `github codespace `or `dev container` locally and pushing the changes to github, the webhook triggers our build trigger job which identified that there is a change in our `frontend` service and run its pipeline, the frontend pipeline scans our code for vulnerabilities, builds our new docker image with the bug fixed, create a SBOM for our image so we can keep track of different supply chain vulnerabilities when they come up, pushes the image to our registry
 
-<video src="assets/ci.webm" width="320" height="240" controls></video>
+[ci.webm](https://github.com/user-attachments/assets/ae2ed176-9bde-4e35-9c78-227768accea9)
+
 
 After the image is `jenkins` pipeline finishes it triggers spinnaker pipeline to deploy our new app to prod, the application is deployed using `kayenta-style` canary so we can analyse our application behavior when it's being deployed and can stop and rollback anytime, using spinnaker as our CD tools gives us the advantage to check the deployment in our cluster, which cannot be done when using a CI tool for CD using `kubectl apply` for example
 
-<video src="assets/spinnaker.webm" width="320" height="240" controls></video>
+[spinnaker.webm](https://github.com/user-attachments/assets/3e6dc41e-1ad0-4f06-b170-7c49279992eb)
+
 
 `kiali` is a good tool to visualize progressive delivery of canary deployment
 
-<video src="assets/kiali.webm" width="320" height="240" controls></video>
+[kiali.webm](https://github.com/user-attachments/assets/25c163d3-ef0f-46fb-bc62-cc7b133708a2)
+
 
 And now our Application is Fixed and we have happy customers ☺️
