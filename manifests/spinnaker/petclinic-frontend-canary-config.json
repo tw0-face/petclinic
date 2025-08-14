@@ -1,0 +1,42 @@
+{
+    "applications": [
+      "petclinic-frontend"
+    ],
+    "classifier": {
+      "groupWeights": {
+        "Group 1": 100
+      }
+    },
+    "configVersion": "1",
+    "id": "frontendCC",
+    "description": "",
+    "isNew": true,
+    "judge": {
+      "judgeConfigurations": {},
+      "name": "NetflixACAJudge-v1.0"
+    },
+    "metrics": [
+      {
+        "analysisConfigurations": {
+          "canary": {
+            "direction": "increase"
+          }
+        },
+        "groups": [
+          "Group 1"
+        ],
+        "name": "Request Latency",
+        "query": {
+          "customFilterTemplate": null,
+          "customInlineTemplate": "PromQL:sum(irate(istio_request_duration_milliseconds_bucket{app=\"petclinic-frontend\", destination_workload=\"${scope}\", destination_workload_namespace=\"${location}\"}[1m]))",
+          "queryType": "PROMQL",
+          "serviceType": "prometheus",
+          "type": "prometheus"
+        },
+        "scopeName": "default"
+      }
+    ],
+    "name": "petclinic-frontend-config",
+    "templates": {}
+  }
+  

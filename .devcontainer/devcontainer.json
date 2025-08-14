@@ -1,0 +1,43 @@
+{
+	"name": "Petclinic Dev",
+	"runArgs": [
+		"--cap-add=NET_ADMIN",
+		"--cap-add=NET_RAW",
+		"--privileged"
+	  ],
+	"build": {
+		"dockerfile": "Dockerfile",
+		"context": ".."
+	},
+
+	"features": {
+		"ghcr.io/devcontainers/features/java:1": {
+			"version": "none",
+			"installMaven": "true",
+			"installGradle": "false"
+		}
+	},
+
+	"forwardPorts": [8080],
+	"portsAttributes": {
+	  "8080": {
+		"label": "petclinic",
+		"onAutoForward": "openPreview",
+		"visibility": "public"
+	  }
+	},
+	"remoteEnv": {
+	  "PUSH_IMAGE_REGISTRY": "annamartin123"
+	},
+
+	"customizations": {
+		"vscode": {
+		  "extensions": [
+			"vmware.vscode-boot-dev-pack",
+			"vscjava.vscode-java-pack"
+		  ]
+		}
+	  },
+	"postCreateCommand": "echo 'Dev container ready! Run: dev [service]'"
+
+}

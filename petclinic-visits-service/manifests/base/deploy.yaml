@@ -1,0 +1,66 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: petclinic-visits-service
+  namespace: petclinic
+  labels:
+    app: visits-service
+    version: prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: visits-service
+      version: prod
+  template:
+    metadata:
+      labels:
+        app: visits-service
+        version: prod
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/actuator/prometheus"
+        proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+    spec:
+      serviceAccountName: visits-service
+      containers:
+      - name: visits-service
+        image: petclinic-visits-service
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            port: 8080
+            path: /actuator/health/liveness
+          initialDelaySeconds: 90
+          periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            port: 8080
+            path: /actuator/health/readiness
+          initialDelaySeconds: 15
+        lifecycle:
+          preStop:
+            exec:
+              command: ["sh", "-c", "sleep 10"]
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            memory: 1Gi
+        env:
+        - name: DELAY_MILLIS
+          value: "0"
+        - name: SPRING_DATASOURCE_URL
+          value: jdbc:mysql://visits-db-mysql.petclinic.svc.cluster.local:3306/service_instance_db
+        - name: SPRING_DATASOURCE_USERNAME
+          value: root
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: visits-db-mysql
+              key: mysql-root-password

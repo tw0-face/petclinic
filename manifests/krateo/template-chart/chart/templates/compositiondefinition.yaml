@@ -1,0 +1,14 @@
+apiVersion: core.krateo.io/v1alpha1
+kind: CompositionDefinition
+metadata:
+  annotations:
+     "krateo.io/connector-verbose": "true"
+     "krateo.io/paused": "false"
+     "krateo.io/release-name": {{ .Release.Name }}
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  {{- with .Values.composition }}
+  chart:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}

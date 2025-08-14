@@ -1,0 +1,47 @@
+apiVersion: logstash.k8s.elastic.co/v1alpha1
+kind: Logstash
+metadata:
+  name: ls
+  namespace: elastic-system
+spec:
+  podTemplate:
+    spec:
+      containers:
+      - name: logstash
+        resources:
+            requests:
+              memory: 250Mi
+              cpu: 100m
+            limits:
+              cpu: 500m
+  count: 1
+  elasticsearchRefs:
+    - name: elasticsearch
+      clusterName: es
+  version: 8.17.4
+  pipelines:
+    - pipeline.id: main
+      config.string: |
+        input {
+          beats {
+            port => 5044
+          }
+        }
+        output {
+          elasticsearch {
+            hosts => [ "${ES_ES_HOSTS}" ]
+            user => "${ES_ES_USER}"
+            password => "${ES_ES_PASSWORD}"
+            ssl_certificate_authorities => "${ES_ES_SSL_CERTIFICATE_AUTHORITY}"
+          }
+        }
+  services:
+    - name: beats
+      service:
+        spec:
+          type: NodePort
+          ports:
+            - port: 5044
+              name: "beat"
+              protocol: TCP
+              targetPort: 5044

@@ -1,0 +1,17 @@
+{
+ "cloudProviders": "kubernetes",
+ "dataSources": {
+  "disabled": [],
+  "enabled": [
+   "canaryConfigs"
+  ]
+ },
+ "description": "petclinic istio app",
+ "email": "mostafarashed3462@gmail.com",
+ "instancePort": 80,
+ "name": "petclinic-vets-service",
+ "repoProjectKey": "tw0-face",
+ "repoSlug": "petclinic",
+ "repoType": "github",
+}
+

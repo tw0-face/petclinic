@@ -1,0 +1,35 @@
+---
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: petclinic-visits-service-destination
+  namespace: petclinic
+spec:
+  host: visits-service.petclinic.svc.cluster.local
+  subsets:
+    - name: prod
+      labels:
+        version: prod
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: petclinic-visits-service-routes
+  namespace: petclinic
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - main-gateway
+  http:
+    - match:
+      - uri:
+          prefix: "/api/visit/"
+      rewrite:
+        uri: "/"
+      route:
+      - destination:
+          host: visits-service.petclinic.svc.cluster.local
+          port:
+            number: 8080
+          subset: prod

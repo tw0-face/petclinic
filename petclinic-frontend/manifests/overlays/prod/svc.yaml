@@ -1,0 +1,14 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: petclinic-frontend
+  namespace: petclinic
+  labels:
+    app: petclinic-frontend
+spec:
+  ports:
+  - name: http
+    port: 8080
+  selector:
+    app: petclinic-frontend

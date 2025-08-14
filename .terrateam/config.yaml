@@ -1,0 +1,54 @@
+hooks:
+  all:
+    pre:
+      - type: oidc
+        provider: gcp
+        service_account: "terrateam@PROJECT_ID.iam.gserviceaccount.com"
+        workload_identity_provider: "WORKLOAD_IDENTITY_PROVIDER"
+  plan:
+    post:
+      - type: run
+        cmd: ['conftest', 'test', '-o', 'table', '${TERRATEAM_TMPDIR}/infracost/infracost.json', '--policy', '$TERRATEAM_ROOT/Infrastructure/policies/compute-cost.rego']
+
+workflows:
+  - tag_query: "dir:terraform"
+    plan:
+      - type: run
+        cmd: ['${TERRATEAM_TF_CMD}', 'fmt', '-check']
+      - type: init      
+      - type: run
+        cmd: ['${TERRATEAM_TF_CMD}', 'validate']
+      - type: plan
+    apply:
+      - type: init
+      - type: apply
+      - type: run
+        cmd: ['echo', 'Error running apply']
+        run_on: failure
+
+cost_estimation:
+  enabled: true
+  provider: infracost
+  currency: USD
+
+apply_requirements:
+  checks:
+    - tag_query: "dir:Infrastructure"
+      approved:
+        enabled: true
+        any_of_count: 1
+
+dirs:
+  terraform:
+    tags: [petclinic, gcp]
+    workspaces:
+      production:
+        tags: [production]
+    when_modified:
+      file_patterns: ["Infreastructure/*.tf", "Infrastructure/*.tfvars"]
+      autoapply: false
+
+drift:
+  enabled: true
+  schedule: daily
+

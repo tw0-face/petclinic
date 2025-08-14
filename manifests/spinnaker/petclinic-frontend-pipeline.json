@@ -1,0 +1,1027 @@
+{
+    "appConfig": {},
+    "expectedArtifacts": [
+      {
+        "displayName": "candidate-img",
+        "id": "b8923be0-535d-4490-993f-541d3c6d8277",
+        "matchArtifact": {
+          "artifactAccount": "docker-registry",
+          "id": "00d34a6d-ad53-4be9-bec0-b3d349f4862e",
+          "name": "annamartin123/petclinic-frontend",
+          "type": "docker/image"
+        },
+        "useDefaultArtifact": true,
+        "usePriorArtifact": false
+      },
+      {
+        "defaultArtifact": {
+          "artifactAccount": "github-artifact-account",
+          "id": "ea752a16-56f1-4556-8780-aba3612f535a",
+          "name": "petclinic-frontend/manifests/overlays/prod/routes.yaml",
+          "reference": "https://api.github.com/repos/tw0-face/petclinic/contents/petclinic-frontend/manifests/overlays/prod/routes.yaml",
+          "type": "github/file",
+          "version": "main"
+        },
+        "displayName": "routes-default",
+        "id": "afa2354d-9102-4952-b490-8abbce434c3b",
+        "matchArtifact": {
+          "artifactAccount": "github-artifact-account",
+          "id": "c2767164-5c7a-4a27-8e03-e76b2492db06",
+          "name": "petclinic-frontend/manifests/overlays/prod/routes.yaml",
+          "type": "github/file"
+        },
+        "useDefaultArtifact": true,
+        "usePriorArtifact": false
+      },
+      {
+        "defaultArtifact": {
+          "artifactAccount": "github-artifact-account",
+          "id": "2430b2ef-4e7d-4080-8a8e-319aedc6ceb8",
+          "name": "petclinic-frontend/manifests/routes-tmpl.yaml",
+          "reference": "https://api.github.com/repos/tw0-face/petclinic/contents/petclinic-frontend/manifests/routes-tmpl.yaml",
+          "type": "github/file",
+          "version": "main"
+        },
+        "displayName": "routes-tmpl",
+        "id": "6b0579a9-1732-4961-be13-91373d026dab",
+        "matchArtifact": {
+          "artifactAccount": "github-artifact-account",
+          "id": "127461e8-2c23-464a-bdab-76dc2eb7ef8b",
+          "name": "petclinic-frontend/manifests/routes-tmpl.yaml",
+          "type": "github/file"
+        },
+        "useDefaultArtifact": true,
+        "usePriorArtifact": false
+      }
+    ],
+    "application": "petclinic-frontend",
+    "name": "petclinic-frontend-canary",
+    "keepWaitingPipelines": false,
+    "lastModifiedBy": "anonymous",
+    "limitConcurrent": true,
+    "schema": "1",
+    "spelEvaluator": "v4",
+    "stages": [
+      {
+        "account": "prod-cluster",
+        "app": "petclinic-frontend",
+        "cloudProvider": "kubernetes",
+        "expectedArtifacts": [
+          {
+            "defaultArtifact": {
+              "customKind": true,
+              "id": "a14f9fed-a91e-4e71-adf0-712a097109ec"
+            },
+            "displayName": "current-img",
+            "id": "5b52788c-4aaf-40a7-ac37-e8b0a4159894",
+            "matchArtifact": {
+              "artifactAccount": "docker-registry",
+              "id": "0155146f-2e5e-4dc1-bde5-6656e8dd3b8f",
+              "type": "docker/image"
+            },
+            "useDefaultArtifact": false,
+            "usePriorArtifact": false
+          }
+        ],
+        "location": "petclinic",
+        "manifestName": "deployment petclinic-frontend",
+        "mode": "static",
+        "name": "Find Img From Prod",
+        "refId": "1",
+        "requisiteStageRefIds": [],
+        "type": "findArtifactsFromResource"
+      },
+      {
+        "expectedArtifacts": [
+          {
+            "defaultArtifact": {
+              "customKind": true,
+              "id": "0fd79864-7580-4c76-b54e-150d1168675d"
+            },
+            "displayName": "canary-yml",
+            "id": "e2e532af-435a-4e36-8266-5f235f92a0bf",
+            "matchArtifact": {
+              "artifactAccount": "embedded-artifact",
+              "customKind": false,
+              "id": "4d5f3fb7-9328-4af6-8949-d8325bcb4f09",
+              "type": "embedded/base64"
+            },
+            "useDefaultArtifact": false,
+            "usePriorArtifact": false
+          }
+        ],
+        "inputArtifact": {
+          "account": "gitrepo-artifact-account",
+          "artifact": {
+            "artifactAccount": "gitrepo-artifact-account",
+            "customKind": true,
+            "id": "5ce16860-5a64-406b-99b9-782d24d46fa5",
+            "location": "petclinic-frontend/manifests",
+            "reference": "https://github.com/tw0-face/petclinic",
+            "type": "git/repo",
+            "version": "main"
+          }
+        },
+        "kustomizeFilePath": "petclinic-frontend/manifests/overlays/canary/kustomization.yaml",
+        "name": "Bake Canary",
+        "overrides": {},
+        "refId": "2",
+        "requisiteStageRefIds": [],
+        "templateRenderer": "KUSTOMIZE4",
+        "type": "bakeManifest"
+      },
+      {
+        "account": "prod-cluster",
+        "cloudProvider": "kubernetes",
+        "manifestArtifactId": "e2e532af-435a-4e36-8266-5f235f92a0bf",
+        "moniker": {
+          "app": "petclinic-frontend"
+        },
+        "name": "Deploy Canary",
+        "namespaceOverride": "petclinic",
+        "refId": "3",
+        "requiredArtifactIds": [
+          "b8923be0-535d-4490-993f-541d3c6d8277"
+        ],
+        "requiredArtifacts": [],
+        "requisiteStageRefIds": [
+          "2"
+        ],
+        "skipExpressionEvaluation": false,
+        "source": "artifact",
+        "trafficManagement": {
+          "enabled": false,
+          "options": {
+            "enableTraffic": false,
+            "services": []
+          }
+        },
+        "type": "deployManifest"
+      },
+      {
+        "expectedArtifacts": [
+          {
+            "defaultArtifact": {
+              "customKind": true,
+              "id": "5afaefa0-1c25-48d6-b297-8a74fb0f9825"
+            },
+            "displayName": "baseline-yml",
+            "id": "356982fe-ed45-4133-9125-aabd93f86637",
+            "matchArtifact": {
+              "artifactAccount": "embedded-artifact",
+              "customKind": false,
+              "id": "30b56e10-36df-402e-8aa0-3045d5c80b7e",
+              "type": "embedded/base64"
+            },
+            "useDefaultArtifact": false,
+            "usePriorArtifact": false
+          }
+        ],
+        "inputArtifact": {
+          "account": "gitrepo-artifact-account",
+          "artifact": {
+            "artifactAccount": "gitrepo-artifact-account",
+            "customKind": true,
+            "id": "2a977df1-50e1-42e7-988c-18e6b9c5bb6b",
+            "location": "petclinic-frontend/manifests",
+            "reference": "https://github.com/tw0-face/petclinic",
+            "type": "git/repo",
+            "version": "main"
+          }
+        },
+        "kustomizeFilePath": "petclinic-frontend/manifests/overlays/baseline/kustomization.yaml",
+        "name": "Bake Baseline",
+        "overrides": {},
+        "refId": "4",
+        "requisiteStageRefIds": [
+          "1"
+        ],
+        "templateRenderer": "KUSTOMIZE4",
+        "type": "bakeManifest"
+      },
+      {
+        "account": "prod-cluster",
+        "cloudProvider": "kubernetes",
+        "manifestArtifactId": "356982fe-ed45-4133-9125-aabd93f86637",
+        "moniker": {
+          "app": "petclinic-frontend"
+        },
+        "name": "Deploy Baseline",
+        "namespaceOverride": "petclinic",
+        "refId": "5",
+        "requiredArtifactIds": [
+          "5b52788c-4aaf-40a7-ac37-e8b0a4159894"
+        ],
+        "requiredArtifacts": [],
+        "requisiteStageRefIds": [
+          "4"
+        ],
+        "skipExpressionEvaluation": false,
+        "source": "artifact",
+        "trafficManagement": {
+          "enabled": false,
+          "options": {
+            "enableTraffic": false,
+            "services": []
+          }
+        },
+        "type": "deployManifest"
+      },
+      {
+        "account": "prod-cluster",
+        "cloudProvider": "kubernetes",
+        "manifestArtifactId": "6b0579a9-1732-4961-be13-91373d026dab",
+        "moniker": {
+          "app": "petclinic-frontend"
+        },
+        "name": "Send 10% to Canary/Baseline",
+        "namespaceOverride": "petclinic",
+        "refId": "6",
+        "requisiteStageRefIds": [
+          "5",
+          "3"
+        ],
+        "skipExpressionEvaluation": false,
+        "source": "artifact",
+        "trafficManagement": {
+          "enabled": false,
+          "options": {
+            "enableTraffic": false,
+            "services": []
+          }
+        },
+        "type": "deployManifest"
+      },
+      {
+        "analysisType": "realTime",
+        "canaryConfig": {
+          "canaryAnalysisIntervalMins": "3",
+          "canaryConfigId": "frontendCC",
+          "lifetimeDuration": "PT0H5M",
+          "metricsAccountName": "prom-istio",
+          "scopes": [
+            {
+              "controlLocation": "petclinic",
+              "controlScope": "petclinic-frontend-baseline",
+              "experimentLocation": "petclinic",
+              "experimentScope": "petclinic-frontend-canary",
+              "extendedScopeParams": {},
+              "scopeName": "default"
+            }
+          ],
+          "scoreThresholds": {
+            "marginal": "75",
+            "pass": "95"
+          },
+          "storageAccountName": "spin-canary-gcp"
+        },
+        "completeOtherBranchesThenFail": false,
+        "continuePipeline": true,
+        "failPipeline": false,
+        "name": "Canary Analysis at 10%",
+        "refId": "7",
+        "requisiteStageRefIds": [
+          "6"
+        ],
+        "type": "kayentaCanary"
+      },
+      {
+        "completeOtherBranchesThenFail": false,
+        "continuePipeline": false,
+        "failPipeline": false,
+        "name": "If Pass",
+        "preconditions": [
+          {
+            "context": {
+              "expression": "${ #stage('Canary Analysis at 10%')['status'].toString() == 'SUCCEEDED'}"
+            },
+            "failPipeline": false,
+            "type": "expression"
+          }
+        ],
+        "refId": "8",
+        "requisiteStageRefIds": [
+          "7"
+        ],
+        "type": "checkPreconditions"
+      },
+      {
+        "completeOtherBranchesThenFail": false,
+        "continuePipeline": false,
+        "failPipeline": false,
+        "name": "If Fail",
+        "preconditions": [
+          {
+            "context": {
+              "expression": "${ #stage('Canary Analysis at 10%')['status'].toString() != 'SUCCEEDED'}"
+            },
+            "failPipeline": false,
+            "type": "expression"
+          }
+        ],
+        "refId": "9",
+        "requisiteStageRefIds": [
+          "7"
+        ],
+        "type": "checkPreconditions"
+      },
+      {
+        "account": "prod-cluster",
+        "cloudProvider": "kubernetes",
+        "manifestArtifactId": "afa2354d-9102-4952-b490-8abbce434c3b",
+        "moniker": {
+          "app": "petclinic-frontend"
+        },
+        "name": "Send 100% to Old Prod",
+        "namespaceOverride": "petclinic",
+        "refId": "10",
+        "requisiteStageRefIds": [
+          "9"
+        ],
+        "skipExpressionEvaluation": false,
+        "source": "artifact",
+        "trafficManagement": {
+          "enabled": false,
+          "options": {
+            "enableTraffic": false,
+            "services": []
+          }
+        },
+        "type": "deployManifest"
+      },
+      {
+        "account": "prod-cluster",
+        "app": "petclinic-frontend",
+        "cloudProvider": "kubernetes",
+        "kinds": [
+          "deployment",
+          "horizontalpodautoscaler"
+        ],
+        "labelSelectors": {
+          "selectors": [
+            {
+              "key": "version",
+              "kind": "EQUALS",
+              "values": [
+                "canary"
+              ]
+            }
+          ]
+        },
+        "location": "petclinic",
+        "mode": "label",
+        "name": "Delete Canary",
+        "options": {
+          "cascading": true
+        },
+        "refId": "11",
+        "requisiteStageRefIds": [
+          "10"
+        ],
+        "type": "deleteManifest"
+      },
+      {
+        "account": "prod-cluster",
+        "cloudProvider": "kubernetes",
+        "manifestArtifactId": "6b0579a9-1732-4961-be13-91373d026dab",
+        "moniker": {
+          "app": "petclinic-frontend"
+        },
+        "name": "Send 20% to Canary/Baseline",
+        "namespaceOverride": "petclinic",
+        "refId": "12",
+        "requisiteStageRefIds": [
+          "8"
+        ],
+        "skipExpressionEvaluation": false,
+        "source": "artifact",
+        "stageEnabled": {
+          "expression": "#stage('Canary Analysis at 10%')['status'].toString() == 'SUCCEEDED'",
+          "type": "expression"
+        },
+        "trafficManagement": {
+          "enabled": false,
+          "options": {
+            "enableTraffic": false,
+            "services": []
+          }
+        },
+        "type": "deployManifest"
+      },
+      {
+        "completeOtherBranchesThenFail": false,
+        "continuePipeline": false,
+        "failPipeline": false,
+        "name": "If Pass",
+        "preconditions": [
+          {
+            "context": {
+              "expression": "${ #stage('Canary Analysis at 20%')['status'].toString() == 'SUCCEEDED'}"
+            },
+            "failPipeline": false,
+            "type": "expression"
+          }
+        ],
+        "refId": "13",
+        "requisiteStageRefIds": [
+          "15"
+        ],
+        "type": "checkPreconditions"
+      },
+      {
+        "completeOtherBranchesThenFail": false,
+        "continuePipeline": false,
+        "failPipeline": false,
+        "name": "If Fail",
+        "preconditions": [
+          {
+            "context": {
+              "expression": "${ #stage('Canary Analysis at 20%')['status'].toString() != 'SUCCEEDED'}"
+            },
+            "failPipeline": false,
+            "type": "expression"
+          }
+        ],
+        "refId": "14",
+        "requisiteStageRefIds": [
+          "15"
+        ],
+        "type": "checkPreconditions"
+      },
+      {
+        "analysisType": "realTime",
+        "canaryConfig": {
+          "canaryAnalysisIntervalMins": "3",
+          "canaryConfigId": "frontendCC",
+          "lifetimeDuration": "PT0H5M",
+          "metricsAccountName": "prom-istio",
+          "scopes": [
+            {
+              "controlLocation": "petclinic",
+              "controlScope": "petclinic-frontend-baseline",
+              "experimentLocation": "petclinic",
+              "experimentScope": "petclinic-frontend-canary",
+              "extendedScopeParams": {},
+              "scopeName": "default"
+            }
+          ],
+          "scoreThresholds": {
+            "marginal": "75",
+            "pass": "95"
+          },
+          "storageAccountName": "spin-canary-gcp"
+        },
+        "completeOtherBranchesThenFail": false,
+        "continuePipeline": true,
+        "failPipeline": false,
+        "name": "Canary Analysis at 20%",
+        "refId": "15",
+        "requisiteStageRefIds": [
+          "12"
+        ],
+        "type": "kayentaCanary"
+      },
+      {
+        "account": "prod-cluster",
+        "cloudProvider": "kubernetes",
+        "manifestArtifactId": "afa2354d-9102-4952-b490-8abbce434c3b",
+        "moniker": {
+          "app": "petclinic-frontend"
+        },
+        "name": "Send 100% to Old Prod",
+        "namespaceOverride": "petclinic",
+        "refId": "16",
+        "requisiteStageRefIds": [
+          "14"
+        ],
+        "skipExpressionEvaluation": false,
+        "source": "artifact",
+        "trafficManagement": {
+          "enabled": false,
+          "options": {
+            "enableTraffic": false,
+            "services": []
+          }
+        },
+        "type": "deployManifest"
+      },
+      {
+        "account": "prod-cluster",
+        "app": "petclinic-frontend",
+        "cloudProvider": "kubernetes",
+        "kinds": [
+          "deployment",
+          "horizontalpodautoscaler"
+        ],
+        "labelSelectors": {
+          "selectors": [
+            {
+              "key": "version",
+              "kind": "EQUALS",
+              "values": [
+                "canary"
+              ]
+            }
+          ]
+        },
+        "location": "petclinic",
+        "mode": "label",
+        "name": "Delete Canary",
+        "options": {
+          "cascading": true
+        },
+        "refId": "17",
+        "requisiteStageRefIds": [
+          "16"
+        ],
+        "type": "deleteManifest"
+      },
+      {
+        "account": "prod-cluster",
+        "cloudProvider": "kubernetes",
+        "manifestArtifactId": "6b0579a9-1732-4961-be13-91373d026dab",
+        "moniker": {
+          "app": "petclinic-frontend"
+        },
+        "name": "Send 40% to Canary/Baseline",
+        "namespaceOverride": "petclinic",
+        "refId": "18",
+        "requisiteStageRefIds": [
+          "13"
+        ],
+        "skipExpressionEvaluation": false,
+        "source": "artifact",
+        "stageEnabled": {
+          "expression": "#stage('Canary Analysis at 20%')['status'].toString() == 'SUCCEEDED'",
+          "type": "expression"
+        },
+        "trafficManagement": {
+          "enabled": false,
+          "options": {
+            "enableTraffic": false,
+            "services": []
+          }
+        },
+        "type": "deployManifest"
+      },
+      {
+        "analysisType": "realTime",
+        "canaryConfig": {
+          "canaryAnalysisIntervalMins": "3",
+          "canaryConfigId": "frontendCC",
+          "lifetimeDuration": "PT0H5M",
+          "metricsAccountName": "prom-istio",
+          "scopes": [
+            {
+              "controlLocation": "petclinic",
+              "controlScope": "petclinic-frontend-baseline",
+              "experimentLocation": "petclinic",
+              "experimentScope": "petclinic-frontend-canary",
+              "extendedScopeParams": {},
+              "scopeName": "default"
+            }
+          ],
+          "scoreThresholds": {
+            "marginal": "75",
+            "pass": "95"
+          },
+          "storageAccountName": "spin-canary-gcp"
+        },
+        "completeOtherBranchesThenFail": false,
+        "continuePipeline": true,
+        "failPipeline": false,
+        "name": "Canary Analysis at 40%",
+        "refId": "19",
+        "requisiteStageRefIds": [
+          "18"
+        ],
+        "type": "kayentaCanary"
+      },
+      {
+        "completeOtherBranchesThenFail": false,
+        "continuePipeline": false,
+        "failPipeline": false,
+        "name": "If Fail",
+        "preconditions": [
+          {
+            "context": {
+              "expression": "${ #stage('Canary Analysis at 40%')['status'].toString() != 'SUCCEEDED'}"
+            },
+            "failPipeline": false,
+            "type": "expression"
+          }
+        ],
+        "refId": "20",
+        "requisiteStageRefIds": [
+          "19"
+        ],
+        "type": "checkPreconditions"
+      },
+      {
+        "completeOtherBranchesThenFail": false,
+        "continuePipeline": false,
+        "failPipeline": false,
+        "name": "If Pass",
+        "preconditions": [
+          {
+            "context": {
+              "expression": "${ #stage('Canary Analysis at 40%')['status'].toString() == 'SUCCEEDED'}"
+            },
+            "failPipeline": false,
+            "type": "expression"
+          }
+        ],
+        "refId": "21",
+        "requisiteStageRefIds": [
+          "19"
+        ],
+        "type": "checkPreconditions"
+      },
+      {
+        "account": "prod-cluster",
+        "cloudProvider": "kubernetes",
+        "manifestArtifactId": "afa2354d-9102-4952-b490-8abbce434c3b",
+        "moniker": {
+          "app": "petclinic-frontend"
+        },
+        "name": "Send 100% to Old Prod",
+        "namespaceOverride": "petclinic",
+        "refId": "22",
+        "requisiteStageRefIds": [
+          "20"
+        ],
+        "skipExpressionEvaluation": false,
+        "source": "artifact",
+        "trafficManagement": {
+          "enabled": false,
+          "options": {
+            "enableTraffic": false,
+            "services": []
+          }
+        },
+        "type": "deployManifest"
+      },
+      {
+        "expectedArtifacts": [
+          {
+            "defaultArtifact": {
+              "customKind": true,
+              "id": "eb235e4a-97c0-434a-9747-1cbd8386e2e8"
+            },
+            "displayName": "prod-base-yml",
+            "id": "bf3a9d4b-7716-43dc-aa1c-732210bc4a09",
+            "matchArtifact": {
+              "artifactAccount": "embedded-artifact",
+              "customKind": false,
+              "id": "53a44e99-762d-4dff-8481-a44db3445aec",
+              "type": "embedded/base64"
+            },
+            "useDefaultArtifact": false,
+            "usePriorArtifact": false
+          }
+        ],
+        "inputArtifact": {
+          "account": "gitrepo-artifact-account",
+          "artifact": {
+            "artifactAccount": "gitrepo-artifact-account",
+            "customKind": true,
+            "id": "8dda301d-4541-4048-a4a8-5d78ae9a37da",
+            "location": "petclinic-frontend/manifests",
+            "reference": "https://github.com/tw0-face/petclinic",
+            "type": "git/repo",
+            "version": "main"
+          }
+        },
+        "kustomizeFilePath": "petclinic-frontend/manifests/base/kustomization.yaml",
+        "name": "Bake Prod Base",
+        "overrides": {},
+        "refId": "24",
+        "requisiteStageRefIds": [
+          "21"
+        ],
+        "stageEnabled": {
+          "expression": "#stage('Canary Analysis at 40%')['status'].toString() == 'SUCCEEDED'",
+          "type": "expression"
+        },
+        "templateRenderer": "KUSTOMIZE4",
+        "type": "bakeManifest"
+      },
+      {
+        "account": "prod-cluster",
+        "cloudProvider": "kubernetes",
+        "manifestArtifactId": "bf3a9d4b-7716-43dc-aa1c-732210bc4a09",
+        "moniker": {
+          "app": "petclinic-frontend"
+        },
+        "name": "Upgrade Prod",
+        "namespaceOverride": "petclinic",
+        "refId": "25",
+        "requiredArtifactIds": [
+          "b8923be0-535d-4490-993f-541d3c6d8277"
+        ],
+        "requiredArtifacts": [],
+        "requisiteStageRefIds": [
+          "24"
+        ],
+        "skipExpressionEvaluation": false,
+        "source": "artifact",
+        "trafficManagement": {
+          "enabled": false,
+          "options": {
+            "enableTraffic": false,
+            "services": []
+          }
+        },
+        "type": "deployManifest"
+      },
+      {
+        "account": "prod-cluster",
+        "cloudProvider": "kubernetes",
+        "manifestArtifactId": "6b0579a9-1732-4961-be13-91373d026dab",
+        "moniker": {
+          "app": "petclinic-frontend"
+        },
+        "name": "Send 20% to Canary/Baseline",
+        "namespaceOverride": "petclinic",
+        "refId": "26",
+        "requisiteStageRefIds": [
+          "25"
+        ],
+        "skipExpressionEvaluation": false,
+        "source": "artifact",
+        "trafficManagement": {
+          "enabled": false,
+          "options": {
+            "enableTraffic": false,
+            "services": []
+          }
+        },
+        "type": "deployManifest"
+      },
+      {
+        "failPipeline": true,
+        "instructions": "<b>Accept New Prod?</b>",
+        "judgmentInputs": [],
+        "name": "Confirm New Prod?",
+        "notifications": [],
+        "refId": "27",
+        "requisiteStageRefIds": [
+          "26"
+        ],
+        "type": "manualJudgment"
+      },
+      {
+        "account": "prod-cluster",
+        "cloudProvider": "kubernetes",
+        "manifestArtifactId": "afa2354d-9102-4952-b490-8abbce434c3b",
+        "moniker": {
+          "app": "petclinic-frontend"
+        },
+        "name": "Send 100% to New Prod",
+        "namespaceOverride": "petclinic",
+        "refId": "28",
+        "requisiteStageRefIds": [
+          "27"
+        ],
+        "skipExpressionEvaluation": false,
+        "source": "artifact",
+        "trafficManagement": {
+          "enabled": false,
+          "options": {
+            "enableTraffic": false,
+            "services": []
+          }
+        },
+        "type": "deployManifest"
+      },
+      {
+        "account": "prod-cluster",
+        "app": "petclinic-frontend",
+        "cloudProvider": "kubernetes",
+        "kinds": [
+          "deployment",
+          "horizontalpodautoscaler"
+        ],
+        "labelSelectors": {
+          "selectors": [
+            {
+              "key": "version",
+              "kind": "EQUALS",
+              "values": [
+                "canary"
+              ]
+            }
+          ]
+        },
+        "location": "petclinic",
+        "mode": "label",
+        "name": "Delete Canary",
+        "options": {
+          "cascading": true
+        },
+        "refId": "29",
+        "requisiteStageRefIds": [
+          "28"
+        ],
+        "type": "deleteManifest"
+      },
+      {
+        "account": "prod-cluster",
+        "app": "petclinic-frontend",
+        "cloudProvider": "kubernetes",
+        "kinds": [
+          "deployment",
+          "horizontalpodautoscaler"
+        ],
+        "labelSelectors": {
+          "selectors": [
+            {
+              "key": "version",
+              "kind": "EQUALS",
+              "values": [
+                "baseline"
+              ]
+            }
+          ]
+        },
+        "location": "petclinic",
+        "mode": "label",
+        "name": "Delete Baseline",
+        "options": {
+          "cascading": true
+        },
+        "refId": "30",
+        "requisiteStageRefIds": [
+          "10"
+        ],
+        "type": "deleteManifest"
+      },
+      {
+        "account": "prod-cluster",
+        "app": "petclinic-frontend",
+        "cloudProvider": "kubernetes",
+        "kinds": [
+          "deployment",
+          "horizontalpodautoscaler"
+        ],
+        "labelSelectors": {
+          "selectors": [
+            {
+              "key": "values",
+              "kind": "EQUALS",
+              "values": [
+                "baseline"
+              ]
+            }
+          ]
+        },
+        "location": "petclinic",
+        "mode": "label",
+        "name": "Delete Baseline",
+        "options": {
+          "cascading": true
+        },
+        "refId": "31",
+        "requisiteStageRefIds": [
+          "16"
+        ],
+        "type": "deleteManifest"
+      },
+      {
+        "account": "prod-cluster",
+        "app": "petclinic-frontend",
+        "cloudProvider": "kubernetes",
+        "kinds": [
+          "deployment",
+          "horizontalpodautoscaler"
+        ],
+        "labelSelectors": {
+          "selectors": [
+            {
+              "key": "version",
+              "kind": "EQUALS",
+              "values": [
+                "baseline"
+              ]
+            }
+          ]
+        },
+        "location": "petclinic",
+        "mode": "label",
+        "name": "Delete Baseline",
+        "options": {
+          "cascading": true
+        },
+        "refId": "32",
+        "requisiteStageRefIds": [
+          "28"
+        ],
+        "type": "deleteManifest"
+      },
+      {
+        "account": "prod-cluster",
+        "app": "petclinic-frontend",
+        "cloudProvider": "kubernetes",
+        "kinds": [
+          "deployment",
+          "horizontalpodautoscaler"
+        ],
+        "labelSelectors": {
+          "selectors": [
+            {
+              "key": "version",
+              "kind": "EQUALS",
+              "values": [
+                "canary"
+              ]
+            }
+          ]
+        },
+        "location": "petclinic",
+        "mode": "label",
+        "name": "Delete Canary",
+        "options": {
+          "cascading": true
+        },
+        "refId": "33",
+        "requisiteStageRefIds": [
+          "22"
+        ],
+        "type": "deleteManifest"
+      },
+      {
+        "account": "prod-cluster",
+        "app": "petclinic-frontend",
+        "cloudProvider": "kubernetes",
+        "kinds": [
+          "deployment",
+          "horizontalpodautoscaler"
+        ],
+        "labelSelectors": {
+          "selectors": [
+            {
+              "key": "version",
+              "kind": "EQUALS",
+              "values": [
+                "baseline"
+              ]
+            }
+          ]
+        },
+        "location": "petclinic",
+        "mode": "label",
+        "name": "Delete Baseline",
+        "options": {
+          "cascading": true
+        },
+        "refId": "34",
+        "requisiteStageRefIds": [
+          "22"
+        ],
+        "type": "deleteManifest"
+      },
+      {
+        "account": "management-cluster",
+        "cloudProvider": "kubernetes",
+        "manifestArtifactId": "bf3a9d4b-7716-43dc-aa1c-732210bc4a09",
+        "moniker": {
+          "app": "petclinic-frontend"
+        },
+        "name": "Deploy to Prod-Like",
+        "namespaceOverride": "petclinic",
+        "refId": "35",
+        "requiredArtifactIds": [
+          "b8923be0-535d-4490-993f-541d3c6d8277"
+        ],
+        "requiredArtifacts": [],
+        "requisiteStageRefIds": [
+          "28"
+        ],
+        "skipExpressionEvaluation": false,
+        "source": "artifact",
+        "trafficManagement": {
+          "enabled": false,
+          "options": {
+            "enableTraffic": false,
+            "services": []
+          }
+        },
+        "type": "deployManifest"
+      }
+    ],
+    "triggers": [
+      {
+        "enabled": true,
+        "expectedArtifactIds": [
+          "b8923be0-535d-4490-993f-541d3c6d8277",
+          "afa2354d-9102-4952-b490-8abbce434c3b",
+          "6b0579a9-1732-4961-be13-91373d026dab"
+        ],
+        "job": "petclinic/job/petclinic-frontend",
+        "master": "jenkins-master",
+        "propertyFile": "image.properties",
+        "type": "jenkins"
+      }
+    ],
+    "updateTs": "1744585560000"
+  }

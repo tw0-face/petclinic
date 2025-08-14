@@ -1,0 +1,38 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- spin-rbac.yaml
+- spin-installer.yaml
+
+namespace: spinnaker
+
+configMapGenerator:
+  - name: apps
+    options:
+      disableNameSuffixHash: true
+    files:
+      - petclinic-frontend-app.json
+      - petclinic-visits-service-app.json
+      - petclinic-vets-service-app.json
+      - petclinic-customers-service-app.json
+  - name: canary-configs
+    options:
+      disableNameSuffixHash: true
+    files:
+      - petclinic-frontend-canary-config.json
+      - petclinic-customers-service-canary-config.json
+      - petclinic-visits-service-canary-config.json
+      - petclinic-vets-service-canary-config.json
+  - name: pipelines
+    options:
+      disableNameSuffixHash: true
+    files:
+      - petclinic-frontend-pipeline.json
+      - petclinic-visits-service-pipeline.json
+      - petclinic-vets-service-pipeline.json
+      - petclinic-customers-service-pipeline.json
+  - name: kubeconfigs
+    options:
+      disableNameSuffixHash: true
+    files:
+      - spinnaker-prod-kubeconfig.yaml

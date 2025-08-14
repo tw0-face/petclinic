@@ -1,0 +1,8 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: visits-service
+  namespace: petclinic
+  labels:
+    account: visits-service

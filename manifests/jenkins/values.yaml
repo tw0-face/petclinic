@@ -1,0 +1,147 @@
+rbac:
+  readSecrets: true # required for external secrets
+agent:
+  retentionTimeout: "30"
+  podRetention: "OnFailure"
+controller:
+  jenkinsUrl: https://$LB/jenkins
+  jenkinsUriPrefix: "/jenkins"
+  ingress:
+    enabled: true
+    path: "/jenkins"
+    apiVersion: "networking.k8s.io/v1"
+    annotations: 
+      kubernetes.io/ingress.class: gce
+    ingressClassName: gce
+  additionalPlugins: 
+  - 'dark-theme'
+  - 'blueocean'
+  - 'pipeline-graph-view'
+  - 'job-dsl'
+  - 'junit'
+  - 'coverage'
+  - 'sonar'
+  - 'dependency-track'
+  - 'kubernetes-credentials-provider'
+  - 'build-token-root'
+  admin:
+    password: 'admin'
+  sidecars:
+    configAutoReload:
+      enabled: true
+  JCasC:
+    configScripts:
+      dark-theme: |
+        appearance:
+          themeManager:
+            disableUserThemes: true
+            theme: "dark" 
+      welcome-message: |
+        jenkins:
+          systemMessage: 🍽️🍽️🍽️ jenkins 🍽️🍽️🍽️
+      sonarqube: |
+        unclassified:
+          sonarglobalconfiguration:                  
+            buildWrapperEnabled: true
+            installations:                           
+              - name: "SONARQUBE"                         
+                serverUrl: "http://sonarqube-sonarqube.sonarqube.svc.cluster.local:9000"
+                credentialsId: sonarqube-api-token
+                triggers:
+                  skipScmCause: true
+                  skipUpstreamCause: true
+      dependencytrack: |
+        unclassified:
+          dependencyTrackPublisher:
+            dependencyTrackUrl: "http://dependency-track-api-server.dependency-track.svc.cluster.local:8080"
+            dependencyTrackApiKey: "dependency-track-api-token"
+            dependencyTrackAutoCreateProjects: true
+      petclinic-job: |
+        jobs:
+          - script: >
+              folder('petclinic')
+          - script: >
+              pipelineJob('petclinic/petclinic-builder') {
+                definition {
+                  cpsScm {
+                    scm {
+                      git {
+                        remote {
+                          url('https://github.com/tw0-face/petclinic')
+                          credentials('gh-token')
+                        }
+                        branch('main')
+                      }
+                    }
+                    scriptPath('manifests/jenkins/petclinic-builder.groovy')
+                  }
+                }
+              }
+          - script: >
+              pipelineJob('petclinic/petclinic-customers-service') {
+                definition {
+                  cpsScm {
+                    scm {
+                      git {
+                        remote {
+                          url('https://github.com/tw0-face/petclinic')
+                          credentials('gh-token')
+                        }
+                        branch('main')
+                      }
+                    }
+                    scriptPath('manifests/jenkins/petclinic-customers-service.groovy')
+                  }
+                }
+              }
+          - script: >
+              pipelineJob('petclinic/petclinic-frontend') {
+                definition {
+                  cpsScm {
+                    scm {
+                      git {
+                        remote {
+                          url('https://github.com/tw0-face/petclinic')
+                          credentials('gh-token')
+                        }
+                        branch('main')
+                      }
+                    }
+                    scriptPath('manifests/jenkins/petclinic-frontend.groovy')
+                  }
+                }
+              }
+          - script: >
+              pipelineJob('petclinic/petclinic-visits-service') {
+                definition {
+                  cpsScm {
+                    scm {
+                      git {
+                        remote {
+                          url('https://github.com/tw0-face/petclinic')
+                          credentials('gh-token')
+                        }
+                        branch('main')
+                      }
+                    }
+                    scriptPath('manifests/jenkins/petclinic-visits-service.groovy')
+                  }
+                }
+              }
+          - script: >
+              pipelineJob('petclinic/petclinic-vets-service') {
+                definition {
+                  cpsScm {
+                    scm {
+                      git {
+                        remote {
+                          url('https://github.com/tw0-face/petclinic')
+                          credentials('gh-token')
+                        }
+                        branch('main')
+                      }
+                    }
+                    scriptPath('manifests/jenkins/petclinic-vets-service.groovy')
+                  }
+                }
+              }

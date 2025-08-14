@@ -1,0 +1,42 @@
+---
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+spec:
+  meshConfig:
+    accessLogFile: /dev/stdout
+    extensionProviders:
+    - name: otel
+      envoyOtelAls:
+        service: opentelemetry-collector.istio-system.svc.cluster.local
+        port: 4317
+    - name: zipkin
+      zipkin:
+        service: zipkin.istio-system.svc.cluster.local
+        port: 9411
+    enableTracing: true
+    defaultConfig:
+      tracing:
+        sampling: 5.0
+  components:
+    pilot:
+      k8s:
+        resources:
+          requests:
+            cpu: 10m
+            memory: 100Mi
+  values:
+    global:
+      proxy:
+        resources:
+          requests:
+            cpu: 10m
+            memory: 40Mi
+    pilot:
+      autoscaleEnabled: false
+      env:
+        PILOT_ENABLE_MYSQL_FILTER: "true"
+    gateways:
+      istio-egressgateway:
+        autoscaleEnabled: false
+      istio-ingressgateway:
+        autoscaleEnabled: false

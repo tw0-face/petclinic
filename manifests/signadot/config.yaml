@@ -1,0 +1,4 @@
+local: 
+  connections:
+  - cluster: petclinic-dev
+    type: ControlPlaneProxy

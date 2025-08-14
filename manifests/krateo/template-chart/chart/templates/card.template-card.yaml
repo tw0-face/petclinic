@@ -1,0 +1,50 @@
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: template-{{ .Release.Name }}-card
+  namespace: {{ .Release.Namespace }}
+data:
+  drawer: "true"
+  form: "true"
+  showFormStructure: "true"
+  drawerSize: large
+---
+apiVersion: templates.krateo.io/v1alpha1
+kind: Widget
+metadata:
+  name: template-{{ .Release.Name }}-card
+  namespace: {{ .Release.Namespace }}
+spec:
+  type: card
+  propsRef:
+    name: template-{{ .Release.Name }}-card
+    namespace: {{ .Release.Namespace }}
+  actions:
+  - template:
+      apiVersion: templates.krateo.io/v1alpha1
+      resource: forms
+      name: template-{{ .Release.Name }}-form
+      namespace: {{ .Release.Namespace }}
+      verb: GET
+  - template:
+      apiVersion: core.krateo.io/v1alpha1
+      resource: compositiondefinitions
+      name: {{ .Release.Name }}
+      namespace: {{ .Release.Namespace }}
+      verb: DELETE
+  app:
+    template:
+      color: ${ .getCompositionDefinition.status.conditions[] | select(.type == "Ready") | if .status == "False" then "orange" elif .status == "True" then "green" else "grey" end }
+    {{- with .Values.portal.card }}
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+      tags: {{ .Release.Namespace }},{{ .Values.portal.card.tags }}
+      status: ${ .getCompositionDefinition.status.conditions[] | select(.type == "Ready") | "Ready:" + .status }
+      date: ${ .getCompositionDefinition.metadata.creationTimestamp }
+  api:
+  - name: getCompositionDefinition
+    path: "/apis/core.krateo.io/v1alpha1/namespaces/{{ .Release.Namespace }}/compositiondefinitions/{{ .Release.Name }}"
+    verb: GET
+    headers:
+    - 'Accept: application/json'

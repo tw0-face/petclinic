@@ -1,0 +1,43 @@
+releases:
+  {{- range $name := list "vets" "visits" "customers" }}
+  - name: {{ $name }}-db-mysql
+    chart: oci://registry-1.docker.io/bitnamicharts/mysql
+    version: 12.3.0
+    namespace: petclinic
+    values:
+      - auth:
+          database: service_instance_db
+          rootPassword: "Pa33w_rd"
+        primary:
+          persistence:
+            size: 1Gi
+        secondary:
+          persistence:
+            size: 1Gi
+  {{- end }}
+
+  - name: petclinic-frontend
+    chart: ./petclinic-frontend/manifests/overlays/prod
+    version: 1.0.0
+    namespace: petclinic
+
+  {{- range $name := list "vets" "customers" "visits" }}
+  - name: petclinic-{{ $name }}-service
+    chart: ./petclinic-{{ $name }}-service/manifests/overlays/prod
+    version: 1.0.0
+    namespace: petclinic
+    needs:
+      - {{ $name }}-db-mysql
+    hooks:
+      - events: ["presync"]
+        showlogs: true
+        command: "kubectl"
+        args:
+          - "wait"
+          - "--namespace=petclinic"
+          - "--for=condition=Ready"
+          - "pod"
+          - "-l"
+          - "app.kubernetes.io/instance={{ $name }}-db-mysql"
+          - "--timeout=180s"
+  {{- end }}

@@ -1,0 +1,25 @@
+composition:
+
+  # when helm is in a registry
+  url: # chartmuseum url
+  version: 1.0.0
+  repo: postgresql
+
+
+  insecureSkipVerifyTLS: true
+
+  # credentials:
+  #   username: username
+  #   passwordRef: # reference to a secret
+  #     key: token
+  #     name: helm-registry-token
+  #     namespace: krateo-system
+
+portal:
+  card:
+    icon: fa-cubes
+    title: postgresql
+    color: blue
+    content: This is a card for postgresql template
+    tags: "1.0.0"
+    status: ""

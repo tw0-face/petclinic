@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: spinnaker
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: spin-clouddriver-sa
+  namespace: spinnaker
+automountServiceAccountToken: true
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: spin-clouddriver-sa
+  namespace: spinnaker
+  annotations:
+    kubernetes.io/service-account.name: "spin-clouddriver-sa"
+type: kubernetes.io/service-account-token
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: spinnaker-admin
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: spin-clouddriver-sa
+  namespace: spinnaker

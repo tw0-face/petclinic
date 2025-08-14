@@ -1,0 +1,11 @@
+spring.jpa.hibernate.ddl-auto: none
+
+spring:
+  sql:
+    init:
+      platform: hsqldb
+
+vets:
+  cache:
+    ttl: 10
+    heap-size: 10

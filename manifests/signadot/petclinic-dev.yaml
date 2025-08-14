@@ -1,0 +1,17 @@
+name: "@{user}-@{deployment}"
+spec:
+  cluster: petclinic-dev
+  ttl:
+    duration: 1d
+  description: "@{user} local sandbox"
+  labels:
+    feature: "@{branch}"
+  local:
+    - name: "@{user}-petclinic"
+      from:
+        kind: Deployment
+        name: "@{deployment}"
+        namespace: "petclinic"
+      mappings:
+        - port: 8080
+          toLocal: "localhost:8080"  

@@ -1,0 +1,9 @@
+apiVersion: templates.krateo.io/v1alpha1
+kind: Form
+metadata:
+  name: template-{{ .Release.Name }}-form
+  namespace: {{ .Release.Namespace }}
+spec:
+  compositionDefinitionRef:
+    name: {{ .Release.Name }}
+    namespace: {{ .Release.Namespace }}

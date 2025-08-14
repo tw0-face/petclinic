@@ -1,0 +1,64 @@
+---
+spring:
+  application:
+    name: vets-service
+  cache:
+    cache-names: vets
+  sql:
+    init:
+      platform: mysql
+      mode: always
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+      generate-ddl: false
+  messages:
+    basename: messages/messages
+vets:
+  cache:
+    ttl: 60
+    heap-size: 101
+server:
+  shutdown: graceful
+  lifecycle:
+    timeout-per-shutdown-phase: 15
+  port: 8080
+  compression:
+    enabled: true
+    mime-types: application/json,text/css,application/javascript
+    min-response-size: 2048
+logging.level.org.springframework: INFO
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true
+    restart:
+      enabled: true
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  tracing:
+    baggage:
+      remote-fields:
+      - x-request-id
+      - x-b3-traceid
+      - x-b3-spanid
+      - x-b3-parentspanid
+      - x-b3-sampled
+      - x-b3-flags

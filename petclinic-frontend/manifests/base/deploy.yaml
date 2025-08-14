@@ -1,0 +1,54 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: petclinic-frontend
+  namespace: petclinic
+  labels:
+    app: petclinic-frontend
+    version: prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: petclinic-frontend
+      version: prod
+  template:
+    metadata:
+      labels:
+        app: petclinic-frontend
+        version: prod
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/actuator/prometheus"
+        proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+    spec:
+      serviceAccountName: petclinic-frontend
+      containers:
+      - name: petclinic-frontend
+        image: petclinic-frontend
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            port: 8080
+            path: /actuator/health/liveness
+          initialDelaySeconds: 90
+          periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            port: 8080
+            path: /actuator/health/readiness
+          initialDelaySeconds: 15
+        lifecycle:
+          preStop:
+            exec:
+              command: ["sh", "-c", "sleep 10"]
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            memory: 1Gi

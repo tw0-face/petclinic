@@ -1,0 +1,29 @@
+#!/bin/bash
+
+DEPLOYMENT=$1
+VALID_SERVICES=("petclinic-visits-service" "petclinic-vets-service" "petclinic-customers-service" "petclinic-frontend")
+GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD|| echo "main")
+GH_WORKSPACE="/workspaces/petclinic"
+
+if [[ ! " ${VALID_SERVICES[@]} " =~ " ${DEPLOYMENT} " ]]; then
+  echo "ERROR: Service '${DEPLOYMENT}' does not exist."
+  exit 1
+fi
+
+# Trap CTRL+C and handle it
+trap 'signadot sandbox delete -f ${GH_WORKSPACE}/manifests/signadot/petclinic-dev.yaml  \
+  --set user=${GITHUB_USER} \
+  --set branch=${GIT_BRANCH} \
+  --set deployment=${DEPLOYMENT} && signadot local disconnect --clean-local-sandboxes; exit' INT
+
+echo "creating signadot sandbox..."
+
+signadot local connect && signadot sandbox apply -f ${GH_WORKSPACE}/manifests/signadot/petclinic-dev.yaml \
+  --set user=${GITHUB_USER} \
+  --set branch=${GIT_BRANCH} \
+  --set deployment=${DEPLOYMENT}
+
+echo "Starting dev..."
+mvn -f "${GH_WORKSPACE}/${DEPLOYMENT}/pom.xml" spring-boot:run \
+  -Dspring-boot.run.jvmArguments="-Dspring.devtools.restart.enabled=true -Dspring.devtools.restart.additional-paths=${GH_WORKSPACE}/${DEPLOYMENT}/src/main/resources" \
+  -Dspring-boot.run.arguments="--logging.level.web=DEBUG"
